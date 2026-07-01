@@ -114,6 +114,7 @@
     }
 
     .nav button {
+      position: relative;
       width: 100%;
       border: 0;
       border-left: 3px solid transparent;
@@ -126,6 +127,31 @@
       cursor: pointer;
       font-size: 13px;
       line-height: 1.3;
+      overflow: hidden;
+      transition:
+        opacity .18s ease,
+        filter .18s ease,
+        transform .18s ease,
+        color .18s ease,
+        background .18s ease,
+        box-shadow .18s ease,
+        border-color .18s ease;
+    }
+
+    .nav button::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0;
+      background:
+        linear-gradient(90deg, rgba(255,211,90,.28), rgba(255,255,255,.08), transparent 62%);
+      transition: opacity .18s ease;
+    }
+
+    .nav:hover button {
+      opacity: .34;
+      filter: saturate(.65) brightness(.72);
     }
 
     .nav button:hover,
@@ -133,6 +159,21 @@
       color: #fff;
       background: rgba(255, 211, 90, .12);
       border-left-color: var(--gold);
+    }
+
+    .nav:hover button:hover {
+      opacity: 1;
+      filter: saturate(1.2) brightness(1.12);
+      transform: translateX(8px);
+      background: linear-gradient(90deg, rgba(255,211,90,.26), rgba(255,255,255,.12));
+      box-shadow:
+        0 10px 24px rgba(0,0,0,.22),
+        inset 0 0 0 1px rgba(255,211,90,.28);
+      border-left-color: var(--gold);
+    }
+
+    .nav:hover button:hover::after {
+      opacity: 1;
     }
 
     main {
