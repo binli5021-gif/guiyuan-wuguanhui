@@ -304,7 +304,9 @@
         transform .2s ease,
         background .2s ease,
         border-color .2s ease,
-        box-shadow .2s ease;
+        box-shadow .2s ease,
+        opacity .28s ease .18s,
+        filter .28s ease .18s;
     }
 
     .bullets li::before {
@@ -355,7 +357,11 @@
       box-shadow: 0 18px 40px rgba(143,0,8,.2);
       cursor: pointer;
       transform-origin: center;
-      transition: transform .24s ease, box-shadow .24s ease, filter .24s ease;
+      transition:
+        transform .24s ease,
+        box-shadow .24s ease,
+        filter .28s ease .18s,
+        opacity .28s ease .18s;
     }
 
     .pillar:hover,
@@ -389,7 +395,10 @@
       align-items: center;
       cursor: pointer;
       transform-origin: left center;
-      transition: transform .22s ease, filter .22s ease;
+      transition:
+        transform .22s ease,
+        filter .28s ease .18s,
+        opacity .28s ease .18s;
     }
 
     .step:last-child {
@@ -445,7 +454,12 @@
       line-height: 1.55;
       box-shadow: 0 18px 50px rgba(143,0,8,.14);
       transform-origin: left center;
-      transition: transform .22s ease, background .22s ease, box-shadow .22s ease;
+      transition:
+        transform .22s ease,
+        background .22s ease,
+        box-shadow .22s ease,
+        opacity .28s ease .18s,
+        filter .28s ease .18s;
     }
 
     .summary-box:hover,
@@ -454,6 +468,21 @@
       transform: scale(1.03);
       background: #fff;
       box-shadow: 0 24px 64px rgba(143,0,8,.2);
+    }
+
+    .bullets li.dimmed,
+    .step.dimmed,
+    .pillar.dimmed,
+    .summary-box.dimmed {
+      opacity: .32 !important;
+      filter: grayscale(.18) saturate(.55) brightness(.88) !important;
+    }
+
+    .spotlight {
+      opacity: 1 !important;
+      filter: none !important;
+      z-index: 8;
+      transition-delay: 0s;
     }
 
     .media-layout {
@@ -871,6 +900,7 @@
     const deck = document.getElementById("deck");
     const nav = document.getElementById("nav");
     const progress = document.getElementById("progress");
+    const pointSelector = ".bullets li, .step, .pillar, .summary-box";
     let current = 0;
 
     function mediaMarkup(slide) {
@@ -941,9 +971,35 @@
 
     function show(index) {
       current = Math.max(0, Math.min(slides.length - 1, index));
-      document.querySelectorAll(".slide").forEach((el, i) => el.classList.toggle("active", i === current));
+      document.querySelectorAll(".slide").forEach((el, i) => {
+        el.classList.toggle("active", i === current);
+        if (i !== current) clearPointFocus(el);
+      });
       document.querySelectorAll(".nav button").forEach((el, i) => el.classList.toggle("active", i === current));
       progress.style.width = `${((current + 1) / slides.length) * 100}%`;
+    }
+
+    function clearPointFocus(slide) {
+      slide.classList.remove("point-focus");
+      slide.querySelectorAll(`${pointSelector}, .spotlight, .dimmed`).forEach(el => {
+        el.classList.remove("spotlight", "dimmed", "revealed");
+      });
+    }
+
+    function focusPoint(target) {
+      const slide = target.closest(".slide");
+      const points = [...slide.querySelectorAll(pointSelector)];
+      const alreadyActive = target.classList.contains("spotlight");
+      clearPointFocus(slide);
+      if (alreadyActive) return;
+      target.classList.add("spotlight", "revealed");
+      window.setTimeout(() => {
+        if (!target.classList.contains("spotlight")) return;
+        slide.classList.add("point-focus");
+        points.forEach(point => {
+          if (point !== target) point.classList.add("dimmed");
+        });
+      }, 120);
     }
 
     nav.addEventListener("click", event => {
@@ -967,8 +1023,10 @@
         if (target.classList.contains("media-panel")) {
           target.classList.add("pressing");
           window.setTimeout(() => target.classList.remove("pressing"), 180);
+          target.classList.toggle("revealed");
+          return;
         }
-        target.classList.toggle("revealed");
+        if (target.matches(pointSelector)) focusPoint(target);
       }
     });
 
