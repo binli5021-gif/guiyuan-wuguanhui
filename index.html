@@ -1041,7 +1041,10 @@
           return;
         }
         if (target.matches(pointSelector)) focusPoint(target);
+        return;
       }
+      const activeSlide = event.target.closest(".slide.active");
+      if (activeSlide) clearPointFocus(activeSlide);
     });
 
     show(0);
