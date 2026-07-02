@@ -473,9 +473,10 @@
     .bullets li.dimmed,
     .step.dimmed,
     .pillar.dimmed,
-    .summary-box.dimmed {
-      opacity: .32 !important;
-      filter: grayscale(.18) saturate(.55) brightness(.88) !important;
+    .summary-box.dimmed,
+    .clickable.dimmed {
+      opacity: .18 !important;
+      filter: grayscale(.45) saturate(.38) brightness(.68) !important;
     }
 
     .spotlight {
@@ -483,6 +484,13 @@
       filter: none !important;
       z-index: 8;
       transition-delay: 0s;
+    }
+
+    .bullets li.spotlight,
+    .step.spotlight .bar,
+    .pillar.spotlight,
+    .summary-box.spotlight {
+      box-shadow: 0 24px 60px rgba(143,0,8,.28);
     }
 
     .media-layout {
@@ -983,6 +991,8 @@
       slide.classList.remove("point-focus");
       slide.querySelectorAll(`${pointSelector}, .spotlight, .dimmed`).forEach(el => {
         el.classList.remove("spotlight", "dimmed", "revealed");
+        el.style.opacity = "";
+        el.style.filter = "";
       });
     }
 
@@ -997,7 +1007,11 @@
         if (!target.classList.contains("spotlight")) return;
         slide.classList.add("point-focus");
         points.forEach(point => {
-          if (point !== target) point.classList.add("dimmed");
+          if (point !== target) {
+            point.classList.add("dimmed");
+            point.style.opacity = ".18";
+            point.style.filter = "grayscale(.45) saturate(.38) brightness(.68)";
+          }
         });
       }, 120);
     }
