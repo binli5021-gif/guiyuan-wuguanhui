@@ -909,7 +909,7 @@
       }
 
       .slide {
-        padding: 24px 18px 64px;
+        padding: 24px 18px 104px;
         gap: 16px;
         overflow-y: auto;
         -webkit-overflow-scrolling: touch;
@@ -917,7 +917,7 @@
       }
 
       .slide::after {
-        height: 8px;
+        display: none;
       }
 
       .ribbon {
@@ -974,7 +974,7 @@
       .content {
         align-content: start;
         gap: 18px;
-        padding-bottom: 12px;
+        padding-bottom: 26px;
       }
 
       .cover .content {
@@ -1009,15 +1009,24 @@
       }
 
       .media-layout {
+        display: flex;
+        flex-direction: column;
         grid-template-columns: 1fr;
         align-content: start;
         gap: 18px;
+      }
+
+      .media-layout > .bullets,
+      .media-layout > .timeline,
+      .media-layout > .media-panel {
+        flex: 0 0 auto;
       }
 
       .media-panel {
         width: 100%;
         min-height: 82px;
         padding: 14px;
+        scroll-margin-bottom: 96px;
       }
 
       .media-toggle {
@@ -1031,7 +1040,35 @@
       }
 
       .media-panel.revealed .media-gallery {
-        max-height: 900px;
+        display: grid;
+        max-height: none;
+        margin-top: 0;
+        margin-bottom: 24px;
+        opacity: 1;
+        overflow: visible;
+        transform: none;
+        order: 1;
+      }
+
+      .media-panel.revealed {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .media-panel:not(.revealed) .media-gallery {
+        display: none;
+      }
+
+      .media-panel.revealed .media-toggle {
+        width: 44px;
+        height: 44px;
+        order: 2;
+        margin: 0 auto 2px;
+        box-shadow:
+          0 6px 0 #650006,
+          0 12px 18px rgba(90,0,6,.25),
+          inset 0 3px 7px rgba(255,255,255,.3),
+          inset 0 -6px 10px rgba(65,0,4,.42);
       }
 
       .media-gallery,
@@ -1041,7 +1078,8 @@
 
       .media-gallery img,
       .media-gallery.two img {
-        height: 210px;
+        height: 188px;
+        object-fit: contain;
       }
 
       .four-grid {
@@ -1120,10 +1158,7 @@
       }
 
       .footer {
-        left: 18px;
-        right: 18px;
-        bottom: 20px;
-        font-size: 11px;
+        display: none;
       }
 
       .controls {
@@ -1156,7 +1191,7 @@
       }
 
       .slide {
-        padding: 22px 14px 64px;
+        padding: 22px 14px 104px;
       }
 
       .slide h2 {
@@ -1186,7 +1221,7 @@
 
       .media-gallery img,
       .media-gallery.two img {
-        height: 186px;
+        height: 176px;
       }
     }
   </style>
@@ -1255,7 +1290,7 @@
       return `<aside class="media-panel clickable" aria-label="点击显示图片">
         <button class="media-toggle" type="button" aria-label="显示或收起图片"></button>
         <div class="media-gallery ${slide.images.length > 1 ? "two" : ""}">
-          ${slide.images.map((src, i) => `<img src="${src}" alt="${slide.title}配图${i + 1}" loading="lazy" />`).join("")}
+          ${slide.images.map((src, i) => `<img src="${src}" alt="${slide.title}配图${i + 1}" />`).join("")}
         </div>
       </aside>`;
     }
@@ -1376,9 +1411,15 @@
       const target = event.target.closest(".clickable");
       if (target) {
         if (target.classList.contains("media-panel")) {
+          if (event.target.closest(".media-gallery") && !event.target.closest(".media-toggle")) return;
           target.classList.add("pressing");
           window.setTimeout(() => target.classList.remove("pressing"), 180);
           target.classList.toggle("revealed");
+          if (target.classList.contains("revealed")) {
+            window.setTimeout(() => {
+              target.scrollIntoView({ block: "nearest", behavior: "smooth" });
+            }, 80);
+          }
           return;
         }
         if (target.matches(pointSelector)) focusPoint(target);
